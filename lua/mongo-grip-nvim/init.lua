@@ -10,27 +10,21 @@
 
 local M = {}
 
-function M.setup()
-    -- sprawdzic jak dziala global
-    print("setup")
-
-    local config = require("config")
+function M.setup(opts)
+    local config = require("mongo-grip-nvim.config")
 
     print(config.connString)
-
-    config.set({
-        connString = "abc"
-    })
-
+    config.set(opts)
     print(config.connString)
 end
 
 local function mongoConnect()
+    local config = require("mongo-grip-nvim.config")
+
     print("connecting...")
+    print(config.connString)
 end
 
 vim.api.nvim_create_user_command("MongoGripConnect", mongoConnect, {})
-
-print("hello from mongo")
 
 return M

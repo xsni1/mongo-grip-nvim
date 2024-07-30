@@ -3,7 +3,9 @@ local config = {
 }
 
 function config.set(opts)
-    config.connString = opts.connString
+    for k, v in pairs(opts) do
+        config[k] = v
+    end
 end
 
 return config
