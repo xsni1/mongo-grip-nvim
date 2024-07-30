@@ -8,10 +8,29 @@
 --
 -- :source % - to run the provided file, % simply means the current file
 
-function MongoConnect()
+local M = {}
+
+function M.setup()
+    -- sprawdzic jak dziala global
+    print("setup")
+
+    local config = require("config")
+
+    print(config.connString)
+
+    config.set({
+        connString = "abc"
+    })
+
+    print(config.connString)
+end
+
+local function mongoConnect()
     print("connecting...")
 end
 
-vim.api.nvim_create_user_command("MongoGripConnect", MongoConnect, {})
+vim.api.nvim_create_user_command("MongoGripConnect", mongoConnect, {})
 
 print("hello from mongo")
+
+return M
