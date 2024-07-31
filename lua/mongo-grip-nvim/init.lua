@@ -18,13 +18,32 @@ function M.setup(opts)
     print(config.connString)
 end
 
+-- lua mongodb driver cannot be used as it lacks some important features.
+-- for example it doesn't allow us to `explain` the query
+--
+-- if performance starts to be an issue, start a child process with mongosh and send queries to it via stdin
 local function mongoConnect()
     local config = require("mongo-grip-nvim.config")
 
     print("connecting...")
     print(config.connString)
+
+    os.execute("mkdir hello")
+end
+
+local function query()
+    local config = require("mongo-grip-nvim.config")
+    local result = vim.system({
+        "mongosh",
+        config.connString,
+        "--eval",
+        "db.getCollectionNames()"
+    }, { text = true }):wait()
+
+    print(result.stdout)
 end
 
 vim.api.nvim_create_user_command("MongoGripConnect", mongoConnect, {})
+vim.api.nvim_create_user_command("MongoGripQuery", query, {})
 
 return M

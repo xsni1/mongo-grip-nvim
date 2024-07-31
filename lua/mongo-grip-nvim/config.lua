@@ -1,5 +1,5 @@
 local config = {
-    connString = "conn"
+    connString = "mongodb://localhost:27017"
 }
 
 function config.set(opts)
