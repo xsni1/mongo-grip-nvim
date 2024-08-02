@@ -29,6 +29,7 @@ local function get_selected_text()
     local mode = vim.api.nvim_get_mode().mode
     local selected = {}
 
+    -- "v" and "." are used to determine "live" cursor position, :help line()
     if mode == "v" then
         if sel_start_line < sel_end_line then
             selected = vim.api.nvim_buf_get_text(0, sel_start_line-1, sel_start_col-1, sel_end_line-1, sel_end_col, {})
@@ -60,7 +61,7 @@ local function get_selected_text()
         end
     end
 
-    return selected
+    return table.concat(selected, "")
 end
 local function mongoConnect()
     local config = require("mongo-grip-nvim.config")
@@ -75,17 +76,24 @@ local function query()
     local config = require("mongo-grip-nvim.config")
     local selected = get_selected_text()
 
-    -- "v" and "." are used to determine "live" cursor position, :help line()
+    local result = vim.system({
+        "mongosh",
+        config.connString,
+        "--eval",
+        selected
+    }, { text = true }):wait()
 
-    print("selected: ", table.concat(selected), #selected)
-    -- local result = vim.system({
-    --     "mongosh",
-    --     config.connString,
-    --     "--eval",
-    --     "db.getCollectionNames()"
-    -- }, { text = true }):wait()
+    local splited = {}
+    for line in string.gmatch(result.stdout, "[^\n]+") do
+        table.insert(splited, line)
+    end
 
-    -- print(result.stdout)
+    local buf = vim.api.nvim_create_buf(false, true)
+    vim.api.nvim_command("belowright split")
+
+    -- vim.api.nvim_buf_set_name(buf, "Query results")
+    vim.api.nvim_buf_set_lines(buf, 0, -1, false, splited)
+    vim.api.nvim_win_set_buf(0, buf)
 end
 
 
