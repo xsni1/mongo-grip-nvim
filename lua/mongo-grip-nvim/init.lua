@@ -1,28 +1,15 @@
--- vim.api - something like stdlib, contains nvim_*
--- vim.opt / vim.o - different way (lua way) of changing internal vim settings (?) :help vim.opt
---   for example: vim.opt.runtimepath:append("./") - used this to add this plugin to runtimepath
---
--- once a module has been required, it is being executed from top to bottom and the returned value (by default it's `true`) is saved to global package.loaded table.
--- :lua print(vim.inspect(package.loaded["mongo-grip-nvim"]))
--- it is done to prevent execution of the same module multiple times
---
--- :source % - to run the provided file, % simply means the current file
-
 local M = {}
 
 function M.setup(opts)
     local config = require("mongo-grip-nvim.config")
 
-    print(config.connString)
     config.set(opts)
-    print(config.connString)
 end
 
 -- lua mongodb driver cannot be used as it lacks some important features.
 -- for example it doesn't allow us to `explain` the query
 --
 -- if performance starts to be an issue, spawn a child process with mongosh and send queries to it via stdin
-
 local function get_selected_text()
     local _, sel_start_line, sel_start_col = unpack(vim.fn.getpos("v"))
     local _, sel_end_line, sel_end_col = unpack(vim.fn.getpos("."))
@@ -63,16 +50,8 @@ local function get_selected_text()
 
     return table.concat(selected, "")
 end
-local function mongoConnect()
-    local config = require("mongo-grip-nvim.config")
 
-    print("connecting...")
-    print(config.connString)
-
-    os.execute("mkdir hello")
-end
-
-local function query()
+function M.make_query()
     local config = require("mongo-grip-nvim.config")
     local selected = get_selected_text()
 
@@ -90,16 +69,13 @@ local function query()
 
     local buf = vim.api.nvim_create_buf(false, true)
     vim.api.nvim_command("belowright split")
-
-    -- vim.api.nvim_buf_set_name(buf, "Query results")
     vim.api.nvim_buf_set_lines(buf, 0, -1, false, splited)
     vim.api.nvim_win_set_buf(0, buf)
 end
 
 
-vim.api.nvim_create_user_command("MongoGripConnect", mongoConnect, {})
-vim.api.nvim_create_user_command("MongoGripQuery", query, {})
+vim.api.nvim_create_user_command("MongoGripQuery", M.make_query, {})
 
-vim.keymap.set({"v"}, "<leader>mq", query)
+vim.keymap.set({"v"}, "<leader>mq", M.make_query)
 
 return M
