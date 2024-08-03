@@ -2,6 +2,8 @@
 
 MongoDB Query Runner for Neovim
 
+https://github.com/user-attachments/assets/c477ba2f-2569-4440-abf1-76e3ce93020c
+
 A lightweight neovim plugin, tailored to fit my needs.  
 In my daily work, I execute numerous MongoDB queries. Tools like `mongosh` or `MongoDB Atlas` are powerful but feel sluggish - mainly because of lack of vim motions support (unacceptable!).  
 
